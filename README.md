@@ -1,4 +1,4 @@
-## Smart Contract Report and Analysis: MyToken
+## Coinbase Smart Contract Report and Analysis: MyToken
 
 ### Overview
 The `MyToken` smart contract is an ERC20 token implementation with additional features such as tax fees, liquidity provision, and anti-sniper mechanisms. It uses the Uniswap V2 protocol for automated market making (AMM) functionalities.
