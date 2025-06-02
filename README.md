@@ -162,27 +162,58 @@ function toggleTrading() external onlyOwner {
 #### Emergency Withdrawal
 - **Emergency Withdraw**: Allows the owner to withdraw any stuck ETH.
 
-### Security Considerations
+### Explanation of Complex Functions
+---
 
-#### Reentrancy
-- **lockTheSwap Modifier**: Protects against reentrancy attacks during swap operations.
+1. **_transfer**
+   - **Purpose**: Handles the transfer of tokens between addresses, applying fees if necessary.
+   - **Logic**:
+     - Checks for zero addresses and sniper status.
+     - Determines if the transaction is a buy or sell.
+     - Applies fees only on swaps.
+     - Calls `_tokenTransfer` to handle the actual transfer logic.
 
-#### Blacklisting
-- **Anti-Sniper Mechanism**: Detects and blacklists snipers during the initial launch, which can be effective but also poses risks if misused.
+2. **swapTokens**
+   - **Purpose**: Swaps accumulated tokens for ETH and sends the ETH to the marketing address.
+   - **Logic**:
+     - Swaps tokens to ETH using `swapTokensForEth`.
+     - Sends the swapped ETH to the marketing address using `sendETHToMarketing`.
 
-#### External Calls
-- **Uniswap Router**: Interacts with external contracts (Uniswap V2 Router), which introduces dependency risk.
-- **Marketing Address**: Sends funds to an external address, which should be trusted.
+3. **swapTokensForEth**
+   - **Purpose**: Swaps tokens for ETH using the Uniswap V2 Router.
+   - **Logic**:
+     - Sets up the path for the swap (token -> WETH).
+     - Approves the router to spend the tokens.
+     - Executes the swap using `swapExactTokensForETHSupportingFeeOnTransferTokens`.
 
-#### Gas Limit
-- **Batch Operations**: Operations like `_confirmedSnipers.pop()` can consume a lot of gas if the list grows large.
+4. **_getValues**
+   - **Purpose**: Calculates the reflection and token values for a given token amount, including fees and liquidity.
+   - **Logic**:
+     - Calls `_getTValues` to get the token values (transfer amount, fee, liquidity).
+     - Calls `_getRValues` to convert the token values to reflection values.
 
-#### Code Complexity
-- **Complex Logic**: The contract contains complex logic for handling reflections, fees, and exclusions, which increases the risk of bugs.
+5. **_getTValues**
+   - **Purpose**: Calculates the token values for a given token amount, including fees and liquidity.
+   - **Logic**:
+     - Calculates the tax fee and liquidity fee.
+     - Computes the transfer amount by subtracting the fees and liquidity.
 
-#### Code Optimization
-- **Gas Efficiency**: Optimize loops and reduce gas consumption, especially in functions that modify arrays.
-- **Function Simplification**: Break down complex functions into smaller, more manageable parts.
+6. **_getRValues**
+   - **Purpose**: Converts token values to reflection values.
+   - **Logic**:
+     - Multiplies the token values by the current rate to get the reflection values.
+
+7. **_reflectFee**
+   - **Purpose**: Deducts fees from the total reflection supply.
+   - **Logic**:
+     - Subtracts the reflection fee from the total reflection supply.
+     - Adds the token fee to the total fees collected.
+
+8. **_takeLiquidity**
+   - **Purpose**: Takes liquidity tokens and updates the reflection balance.
+   - **Logic**:
+     - Converts the liquidity fee to reflection value.
+     - Updates the reflection balance of the contract.
 
 
 
